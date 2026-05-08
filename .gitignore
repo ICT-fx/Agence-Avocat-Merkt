@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Unused source files
+Gemini_Generated_Image_*.png
+uploads/profil avocat/
+
+# Logs
+*.log
+
+# Env
+.env
+.env.local

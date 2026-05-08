@@ -1,0 +1,77 @@
+/* MERKT [&] associés — Design tokens
+   Premium / institutional / editorial — Geneva law firm
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+:root {
+  /* Palette — elevated navy + warm ivory + restrained gold */
+  --ink:        #0A1628;   /* deep navy / near-black */
+  --ink-2:      #142238;   /* secondary navy */
+  --dufour:     #1E3A5F;   /* signature navy */
+  --steel:      #5A6B7F;   /* muted steel blue (body on light) */
+  --pale:       #A8B8C8;   /* cool grey-blue */
+  --line:       #D8DCE2;   /* hairlines on light */
+  --line-dark:  #1F2D44;   /* hairlines on dark */
+  --ivory:      #F5F2EC;   /* warm paper background */
+  --bone:       #ECE7DD;   /* slightly deeper warm */
+  --paper:      #FAF8F3;   /* lightest warm */
+  --white:      #FFFFFF;
+  --gold:       #B89968;   /* used SPARINGLY: numbers 1946, key marks */
+  --gold-soft:  #C9AE82;
+  --amp-tint:   #E8DCC4;   /* desaturated gold for the [&] watermark */
+
+  /* Typography */
+  --serif: "Fraunces", "GT Sectra", "Canela", Georgia, serif;
+  --sans:  "Inter", "Söhne", "Neue Haas Grotesk", system-ui, sans-serif;
+  --mono:  "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Editorial scale */
+  --fs-display: clamp(72px, 11vw, 200px);
+  --fs-h1:      clamp(48px, 6vw, 96px);
+  --fs-h2:      clamp(32px, 4vw, 56px);
+  --fs-lede:    clamp(18px, 1.4vw, 22px);
+  --fs-body:    16px;
+  --fs-meta:    11px;
+
+  /* Rhythm */
+  --gutter:     clamp(24px, 4vw, 64px);
+  --section:    clamp(80px, 12vw, 160px);
+}
+
+* { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+html, body {
+  margin: 0; padding: 0;
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  color: var(--ink);
+  background: var(--ivory);
+  line-height: 1.55;
+  font-feature-settings: "ss01", "cv11";
+}
+
+::selection { background: var(--ink); color: var(--ivory); }
+
+a { color: inherit; text-decoration: none; }
+
+/* Utility — meta tag (uppercase mono) */
+.meta {
+  font-family: var(--mono);
+  font-size: var(--fs-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 400;
+}
+
+/* Hairline */
+.hr { height: 1px; background: var(--line); border: 0; }
+.hr-dark { height: 1px; background: var(--line-dark); border: 0; }
+
+/* The signature [&] monogram — used as a graphic element */
+.amp-mark {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  line-height: 0.8;
+}

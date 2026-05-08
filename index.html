@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>MERKT [&] associés — Avocats à Genève</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="design-tokens.css" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230A1628'/%3E%3Ctext x='16' y='26' text-anchor='middle' font-family='Georgia%2C serif' font-style='italic' font-weight='300' font-size='24' fill='%23B89968'%3E%26%3C/text%3E%3C/svg%3E" />
+<style>
+  html, body { height: 100%; }
+  body { background: var(--ivory); overflow: hidden; }
+  #root, .app-root { height: 100%; }
+
+  @keyframes amp-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(184,153,104,0.7); }
+    50%      { box-shadow: 0 0 0 6px rgba(184,153,104,0); }
+  }
+
+  /* Page transition curtain */
+  .curtain {
+    position: fixed; inset: 0; z-index: 60;
+    background: var(--ivory);
+    transform-origin: top;
+    pointer-events: none;
+  }
+
+  /* Custom scrollbar in scroll container */
+  .scroll::-webkit-scrollbar { width: 8px; }
+  .scroll::-webkit-scrollbar-thumb { background: var(--line); }
+  .scroll::-webkit-scrollbar-track { background: transparent; }
+
+  /* ── Loading screen ── */
+  #loader {
+    position: fixed; inset: 0; z-index: 200;
+    background: var(--ink);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 32px;
+    animation: loader-exit 700ms cubic-bezier(.7,.05,.2,1) 2.8s forwards;
+  }
+  #loader .amp {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(140px, 22vw, 280px);
+    line-height: 0.8;
+    color: var(--gold);
+    position: relative;
+    /* clip reveals left→right, simulating the glyph being drawn */
+    clip-path: inset(0 100% 0 0);
+    animation: amp-write 1.5s cubic-bezier(.4, 0, .2, 1) 0.15s forwards;
+  }
+  /* thin gold cursor that leads the reveal */
+  #loader .amp::after {
+    content: '';
+    position: absolute;
+    top: 5%; bottom: 5%;
+    right: 0;
+    width: 2px;
+    background: var(--gold);
+    opacity: 0.7;
+  }
+  #loader .wordmark {
+    display: flex; align-items: baseline; gap: 12px;
+    opacity: 0;
+    animation: word-up 700ms ease 1.5s forwards;
+  }
+  #loader .wordmark .merkt {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(22px, 3vw, 36px);
+    letter-spacing: -0.01em;
+    color: var(--ivory);
+  }
+  #loader .wordmark .assoc {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(22px, 3vw, 36px);
+    letter-spacing: -0.01em;
+    color: rgba(245,242,236,0.5);
+  }
+  #loader .tagline {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    opacity: 0;
+    animation: word-up 600ms ease 1.9s forwards;
+  }
+
+  @keyframes amp-write {
+    0%   { clip-path: inset(0 100% 0 0); }
+    100% { clip-path: inset(0 0% 0 0); }
+  }
+  @keyframes word-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes loader-exit {
+    0%   { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-32px); pointer-events: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="amp">[&amp;]</div>
+  <div class="wordmark">
+    <span class="merkt">MERKT</span>
+    <span class="assoc">associés</span>
+  </div>
+  <div class="tagline">Avocats à Genève · Depuis 1946</div>
+</div>
+
+<div id="root"></div>
+
+<script>
+  document.getElementById('loader').addEventListener('animationend', function(e) {
+    if (e.animationName === 'loader-exit') {
+      this.remove();
+      window.__appReady = true;
+      document.dispatchEvent(new CustomEvent('app-ready'));
+    }
+  });
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="content.jsx"></script>
+<script type="text/babel" src="primitives.jsx"></script>
+<script type="text/babel" src="pages.jsx"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const ROUTES = ["/", "/etude", "/expertises", "/equipe", "/contact"];
+
+function readRoute() {
+  const h = window.location.hash.replace(/^#/, "") || "/";
+  if (ROUTES.includes(h)) return h;
+  if (/^\/equipe\/[a-z]+$/.test(h)) return h;
+  return "/";
+}
+
+function App() {
+  const [lang, setLang] = useState("fr");
+  const [route, setRoute] = useState(readRoute());
+  const [transitioning, setTransitioning] = useState(false);
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    const onHash = () => setRoute(readRoute());
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let vel = 0;
+    let raf = null;
+    const tick = () => {
+      vel *= 0.78;
+      el.scrollTop += vel;
+      if (Math.abs(vel) > 0.4) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        vel = 0;
+        raf = null;
+      }
+    };
+    const onWheel = (e) => {
+      e.preventDefault();
+      const delta = e.deltaMode === 1 ? e.deltaY * 20 : e.deltaMode === 2 ? el.clientHeight * 0.85 : e.deltaY;
+      vel = delta;
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  const go = (to) => {
+    if (to === route) return;
+    setTransitioning(true);
+    setTimeout(() => {
+      window.location.hash = to;
+      if (scrollRef.current) scrollRef.current.scrollTop = 0;
+      setTimeout(() => setTransitioning(false), 50);
+    }, 480);
+  };
+
+  const avocatSlug = route.startsWith("/equipe/") ? route.split("/")[2] : null;
+  const Page =
+    route === "/etude"      ? EtudePage :
+    route === "/expertises" ? ExpertisesPage :
+    avocatSlug              ? AvocatPage :
+    route === "/equipe"     ? EquipePage :
+    route === "/contact"    ? ContactPage :
+    HomePage;
+
+  return (
+    <div className="app-root" style={{ position: "relative", height: "100%", overflow: "hidden" }}>
+      <div ref={scrollRef} className="scroll" style={{
+        position: "relative",
+        height: "100%", overflowY: "auto", overflowX: "hidden",
+        background: "transparent",
+      }}>
+        <AmpWatermark scrollRef={scrollRef} route={route} />
+        <TopNav lang={lang} setLang={setLang} route={route} go={go} />
+        <Page key={route} lang={lang} go={go} slug={avocatSlug} />
+        <Footer lang={lang} go={go} />
+      </div>
+
+      {/* Curtain transition */}
+      <div className="curtain" style={{
+        transform: transitioning ? "scaleY(1)" : "scaleY(0)",
+        transformOrigin: transitioning ? "top" : "bottom",
+        transition: "transform 480ms cubic-bezier(.7,.05,.2,1)",
+      }} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
