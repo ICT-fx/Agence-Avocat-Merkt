@@ -159,34 +159,6 @@ function App() {
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    let vel = 0;
-    let raf = null;
-    const tick = () => {
-      vel *= 0.78;
-      el.scrollTop += vel;
-      if (Math.abs(vel) > 0.4) {
-        raf = requestAnimationFrame(tick);
-      } else {
-        vel = 0;
-        raf = null;
-      }
-    };
-    const onWheel = (e) => {
-      e.preventDefault();
-      const delta = e.deltaMode === 1 ? e.deltaY * 20 : e.deltaMode === 2 ? el.clientHeight * 0.85 : e.deltaY;
-      vel = delta;
-      if (!raf) raf = requestAnimationFrame(tick);
-    };
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => {
-      el.removeEventListener("wheel", onWheel);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-
   const go = (to) => {
     if (to === route) return;
     setTransitioning(true);

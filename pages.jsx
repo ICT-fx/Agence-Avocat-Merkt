@@ -2,62 +2,6 @@
 
 const { useState: useS, useEffect: useE, useRef: useR } = React;
 
-// Image that pans vertically inside its frame as the user scrolls.
-// When the frame enters the viewport from the bottom, the top of the image is shown;
-// when the frame exits at the top, the bottom of the image is shown.
-function ParallaxImage({ src, alt, scale = 1.4, style }) {
-  const wrapRef = useR(null);
-  const imgRef = useR(null);
-
-  useE(() => {
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      const el = wrapRef.current;
-      const img = imgRef.current;
-      if (!el || !img) return;
-      const rect = el.getBoundingClientRect();
-      const vh = window.innerHeight || document.documentElement.clientHeight;
-      const denom = vh + rect.height;
-      const progress = Math.max(0, Math.min(1, (vh - rect.top) / denom));
-      const maxPct = ((scale - 1) / scale) * 100;
-      img.style.transform = `translate3d(0, ${-progress * maxPct}%, 0)`;
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-    update();
-    // Listen in capture phase so scroll events from any scrollable
-    // ancestor (the app uses an inner scroll container) trigger updates.
-    document.addEventListener("scroll", onScroll, { passive: true, capture: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      document.removeEventListener("scroll", onScroll, { capture: true });
-      window.removeEventListener("resize", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [scale]);
-
-  return (
-    <div ref={wrapRef} style={{ position: "relative", overflow: "hidden", width: "100%", height: "100%", ...style }}>
-      <img
-        ref={imgRef}
-        src={src}
-        alt={alt}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: `${scale * 100}%`,
-          objectFit: "cover",
-          willChange: "transform",
-        }}
-      />
-    </div>
-  );
-}
-
 // ============================================================
 // HOME
 // ============================================================
@@ -185,10 +129,10 @@ function HomePage({ lang, go }) {
             </Reveal>
           </div>
           <Reveal delay={200} style={{ borderRadius: 12, overflow: "hidden", border: "1px solid var(--line)", alignSelf: "stretch" }}>
-            <ParallaxImage
+            <img
               src="uploads/facade-2.png"
               alt="15, rue du Général-Dufour — MERKT [&] associés"
-              scale={1.6}
+              style={{ width: "100%", height: "100%", display: "block", objectFit: "cover" }}
             />
           </Reveal>
         </div>
